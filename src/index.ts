@@ -13,7 +13,7 @@ import { getWorkItem, getReleaseItems, searchWorkItems, listReleases, listProjec
 const server = new Server(
   {
     name: 'pingcode-mcp',
-    version: '1.0.1',
+    version: '1.1.1',
   },
   {
     capabilities: {

@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/pingcode-mcp.svg)](https://www.npmjs.com/package/pingcode-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-PingCode MCP (Model Context Protocol) 服务器,让 AI 助手能够查询 PingCode 项目管理数据,包括工作项、发布版本、缺陷和需求等。
+PingCode MCP (Model Context Protocol) 服务器,让 AI 助手能够与 PingCode 项目管理系统交互,支持查询工作项、发布版本管理、更新状态和缺陷字段等操作。
 
 ## ✨ 功能特性
 
@@ -12,6 +12,8 @@ PingCode MCP (Model Context Protocol) 服务器,让 AI 助手能够查询 PingCo
 - 📋 **发布管理** - 查询发布版本关联的缺陷和需求
 - 🔎 **全文搜索** - 搜索项目中的工作项
 - 📊 **版本列表** - 列出项目的所有发布版本
+- ✏️ **状态更新** - 更新工作项的状态
+- 🐛 **缺陷管理** - 更新缺陷的原因分析、解决方案和解决方法
 
 ## 📦 安装
 
@@ -49,7 +51,10 @@ npx pingcode-mcp
 {
   "mcpServers": {
     "pingcode-mcp": {
-      "command": "pingcode-mcp"
+      "command": "pingcode-mcp",
+      "env": {
+        "PINGCODE_DOMAIN": "your-company.pingcode.com"
+      }
     }
   }
 }
@@ -62,11 +67,16 @@ npx pingcode-mcp
   "mcpServers": {
     "pingcode-mcp": {
       "command": "npx",
-      "args": ["-y", "pingcode-mcp"]
+      "args": ["-y", "pingcode-mcp"],
+      "env": {
+        "PINGCODE_DOMAIN": "your-company.pingcode.com"
+      }
     }
   }
 }
 ```
+
+> **注意**: 如果不配置 `PINGCODE_DOMAIN`，默认使用 `neuralgalaxy.pingcode.com`。
 
 ### 2. 首次登录
 
@@ -94,17 +104,19 @@ npx pingcode-mcp
 
 ## 🛠️ 可用工具
 
-| 工具名称 | 说明 | 参数 |
-|---------|------|------|
-| `login` | 打开浏览器进行登录 | 无 |
-| `logout` | 退出登录，清除凭证 | 无 |
-| `check_auth` | 检查登录状态 | 无 |
-| `get_work_item` | 获取工作项详情 | `identifier`: 工作项编号（如 LFY-123） |
-| `list_projects` | 列出所有可访问项目 | 无 |
-| `list_releases` | 列出项目的发布版本 | `project_id`: 项目标识（如 LFY） |
-| `get_release_items` | 获取版本关联的工作项 | `release_id`: 版本ID<br>`project_id`: 项目标识<br>`item_type`: bug/story/all |
-| `search_work_items` | 搜索工作项 | `query`: 搜索关键词<br>`project_id`: 项目标识（可选） |
-| `update_work_item_state` | 更新工作项状态 | `work_item_id`: 工作项编号<br>`state_name`: 目标状态 |
+| 工具名称                 | 说明                       | 参数                                                                         |
+| ------------------------ | -------------------------- | ---------------------------------------------------------------------------- |
+| `login`                  | 打开浏览器进行登录         | 无                                                                           |
+| `logout`                 | 退出登录，清除凭证         | 无                                                                           |
+| `check_auth`             | 检查登录状态               | 无                                                                           |
+| `get_work_item`          | 获取工作项详情             | `identifier`: 工作项编号（如 LFY-123）                                       |
+| `list_projects`          | 列出所有可访问项目         | 无                                                                           |
+| `list_releases`          | 列出项目的发布版本         | `project_id`: 项目标识（如 LFY）                                             |
+| `get_release_items`      | 获取版本关联的工作项       | `release_id`: 版本ID<br>`project_id`: 项目标识<br>`item_type`: bug/story/all |
+| `search_work_items`      | 搜索工作项                 | `query`: 搜索关键词<br>`project_id`: 项目标识（可选）                        |
+| `update_work_item_state` | 更新工作项状态             | `work_item_id`: 工作项编号<br>`state_name`: 目标状态                         |
+| `get_bug_field_options`  | 获取缺陷字段可选值         | `work_item_id`: 缺陷工作项编号                                               |
+| `update_bug_fields`      | 更新缺陷的分析和解决方案   | `work_item_id`: 工作项编号<br>`reason`: 原因分析（可选）<br>`solution`: 解决方案（可选）<br>`jiejuefangfa`: 解决方法（可选） |
 
 ## 💡 使用示例
 
@@ -117,6 +129,7 @@ npx pingcode-mcp
 ### 查询发布版本的缺陷
 
 从发布页面 URL 获取参数：
+
 ```
 https://yourcompany.pingcode.com/pjm/projects/LFY/releases/QxednuAG/workitems
                                                     ↑              ↑
@@ -124,6 +137,7 @@ https://yourcompany.pingcode.com/pjm/projects/LFY/releases/QxednuAG/workitems
 ```
 
 然后询问 AI:
+
 ```
 查询项目 LFY 的发布版本 QxednuAG 中的所有缺陷
 ```
@@ -134,13 +148,31 @@ https://yourcompany.pingcode.com/pjm/projects/LFY/releases/QxednuAG/workitems
 在优点云项目中搜索包含"登录"的工作项
 ```
 
-## 🔧 本地开发
+### 更新工作项状态
+
+```
+把 LFY-2527 的状态改为已完成
+```
+
+### 更新缺陷分析字段
+
+```
+帮我更新 LFY-2527 的原因分析和解决方案
+```
+
+## 🔧 环境变量
+
+| 变量名 | 说明 | 默认值 |
+|--------|------|--------|
+| `PINGCODE_DOMAIN` | PingCode 域名 | `neuralgalaxy.pingcode.com` |
+
+## 🔨 本地开发
 
 如果你想修改源码或为项目贡献代码：
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/pingcode-mcp.git
+git clone https://github.com/ratatatat1/pingcode-mcp.git
 cd pingcode-mcp
 
 # 安装依赖
@@ -201,13 +233,13 @@ pingcode-mcp/
 
 ## ❓ 常见问题
 
-**Q: 凭证过期了怎么办？**  
+**Q: 凭证过期了怎么办？**
 A: 重新调用 `login` 工具即可。
 
-**Q: 支持哪些 MCP 客户端？**  
+**Q: 支持哪些 MCP 客户端？**
 A: 支持所有实现了 MCP 协议的客户端，包括 Windsurf、Cursor、Claude Desktop 等。
 
-**Q: 可以在 CI/CD 中使用吗？**  
+**Q: 可以在 CI/CD 中使用吗？**
 A: 登录需要浏览器交互，不适合 CI/CD 环境。如需自动化，建议使用 PingCode API。
 
 ## 📄 许可证
@@ -220,5 +252,5 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 
 ---
 
-**作者**: ratat  
+**作者**: ratat
 **关键词**: mcp, pingcode, model-context-protocol, ai, release, bug-tracking, project-management
