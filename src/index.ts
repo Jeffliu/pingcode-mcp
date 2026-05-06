@@ -224,7 +224,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: 'op_list_product_ideas',
         description:
-          '【开放平台 / Ship 模块】列出某个产品下的所有需求（Idea）。支持可选关键词搜索。',
+          '【开放平台 / Ship 模块】列出某个产品下的所有需求（Idea）。每条含模块列（接口 suite.name，未设置则为 -）。支持可选关键词搜索。可选 include_watchers=true 时在每条后追加关注人（额外调用 GET /v1/participants，默认仅对前 80 条拉取，避免频率限制）。',
         inputSchema: {
           type: 'object',
           properties: {
@@ -236,6 +236,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               type: 'string',
               description: '搜索关键词（可选），匹配需求编号或标题',
             },
+            include_watchers: {
+              type: 'boolean',
+              description:
+                '为 true 时追加每条需求的关注人列表（默认 false）。列表超过 80 条时仅前 80 条请求关注人接口。',
+            },
           },
           required: ['product_id'],
         },
@@ -243,7 +248,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: 'op_list_product_tickets',
         description:
-          '【开放平台 / Ship 模块】列出某个产品下的所有工单（Ticket）。支持可选关键词搜索。',
+          '【开放平台 / Ship 模块】列出某个产品下的所有工单（Ticket）。每条含模块列（若接口返回 suite 则显示名称，否则 -）。支持可选关键词搜索。可选 include_watchers=true 追加关注人（GET /v1/participants，默认最多前 80 条）。',
         inputSchema: {
           type: 'object',
           properties: {
@@ -255,6 +260,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               type: 'string',
               description: '搜索关键词（可选），匹配工单编号或标题',
             },
+            include_watchers: {
+              type: 'boolean',
+              description:
+                '为 true 时追加每条工单的关注人列表（默认 false）。超过 80 条时仅前 80 条拉取关注人。',
+            },
           },
           required: ['product_id'],
         },
@@ -262,13 +272,18 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: 'op_list_product_work_items',
         description:
-          '【开放平台 / Ship 模块】一次性列出某个产品下的所有需求和工单（合并输出）。',
+          '【开放平台 / Ship 模块】一次性列出某个产品下的所有需求和工单（合并输出）。需求/工单各行均含模块列（suite）。可选 include_watchers=true 为需求/工单分别追加关注人（各最多前 80 条）。',
         inputSchema: {
           type: 'object',
           properties: {
             product_id: {
               type: 'string',
               description: '产品 ID（24 位 hex），可通过 op_list_products 获取',
+            },
+            include_watchers: {
+              type: 'boolean',
+              description:
+                '为 true 时在每条需求/工单后追加关注人（默认 false）。需求与工单各自仅对前 80 条请求关注人接口。',
             },
           },
           required: ['product_id'],
@@ -496,11 +511,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'op_list_product_ideas': {
-        const { product_id, keywords } = args as {
+        const { product_id, keywords, include_watchers } = args as {
           product_id: string;
           keywords?: string;
+          include_watchers?: boolean;
         };
-        const result = await opListProductIdeas(product_id, keywords);
+        const result = await opListProductIdeas(
+          product_id,
+          keywords,
+          include_watchers === true
+        );
         return {
           content: [
             { type: 'text', text: result.success ? result.data! : `错误: ${result.error}` },
@@ -510,11 +530,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'op_list_product_tickets': {
-        const { product_id, keywords } = args as {
+        const { product_id, keywords, include_watchers } = args as {
           product_id: string;
           keywords?: string;
+          include_watchers?: boolean;
         };
-        const result = await opListProductTickets(product_id, keywords);
+        const result = await opListProductTickets(
+          product_id,
+          keywords,
+          include_watchers === true
+        );
         return {
           content: [
             { type: 'text', text: result.success ? result.data! : `错误: ${result.error}` },
@@ -524,8 +549,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'op_list_product_work_items': {
-        const { product_id } = args as { product_id: string };
-        const result = await opListProductWorkItems(product_id);
+        const { product_id, include_watchers } = args as {
+          product_id: string;
+          include_watchers?: boolean;
+        };
+        const result = await opListProductWorkItems(
+          product_id,
+          include_watchers === true
+        );
         return {
           content: [
             { type: 'text', text: result.success ? result.data! : `错误: ${result.error}` },

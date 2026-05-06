@@ -171,6 +171,8 @@ export interface ShipIdea {
   identifier?: string;
   title: string;
   description?: string;
+  /** 需求模块（GET /v1/ship/ideas 中的 suite，如 type=module） */
+  suite?: ShipRef;
   state?: ShipRef;
   priority?: ShipRef;
   assignee?: ShipRef;
@@ -188,6 +190,8 @@ export interface ShipTicket {
   identifier?: string;
   title: string;
   description?: string;
+  /** 部分租户/版本下工单可能带 suite，与需求模块同源字段 */
+  suite?: ShipRef;
   type?: ShipRef;
   state?: ShipRef;
   priority?: ShipRef;
@@ -196,4 +200,14 @@ export interface ShipTicket {
   url?: string;
   created_at?: number;
   updated_at?: number;
+}
+
+/**
+ * GET /v1/participants 返回的关注人条目（用户或用户组）
+ */
+export interface ParticipantRow {
+  id: string;
+  type?: string;
+  user?: { id: string; name?: string; display_name?: string };
+  user_group?: { id: string; name?: string };
 }
