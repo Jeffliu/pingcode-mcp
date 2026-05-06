@@ -1,16 +1,16 @@
 {
   "name": "pingcode-jeff",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "PingCode MCP（Jeff 维护版）：PJM 工作项/发布与开放平台 Ship 产品·需求·工单，支持浏览器登录与企业令牌",
   "author": "Jeff",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/liuzhaoren/pingcode-jeff.git"
+    "url": "git+https://github.com/Jeffliu/pingcode-jeff.git"
   },
-  "homepage": "https://github.com/liuzhaoren/pingcode-jeff#readme",
+  "homepage": "https://github.com/Jeffliu/pingcode-jeff#readme",
   "bugs": {
-    "url": "https://github.com/liuzhaoren/pingcode-jeff/issues"
+    "url": "https://github.com/Jeffliu/pingcode-jeff/issues"
   },
   "keywords": [
     "mcp",
