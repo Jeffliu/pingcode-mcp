@@ -65,7 +65,7 @@ npx pingcode-jeff
 | 用途                                                 | 环境变量                                          | 说明                                                                       |
 | -------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------ |
 | **PJM**（`login`、`list_projects`、`get_work_item` 等） | `PINGCODE_DOMAIN`                             | 你的 PingCode 访问域名，如 `acme.pingcode.com`；不配则默认 `neuralgalaxy.pingcode.com` |
-| **开放平台 Ship**（`op_list_products` 等）                | `PINGCODE_CLIENT_ID`、`PINGCODE_CLIENT_SECRET` | 企业后台「凭据管理」里应用的 **客户端凭据（client_credentials）**；不配则 `op_`* 会报错              |
+| **开放平台 Ship**（`op_list_products` 等）                | `PINGCODE_CLIENT_ID`、`PINGCODE_CLIENT_SECRET` | 企业后台「凭据管理」里应用的 **客户端凭据（client_credentials）**；不配则 `op`_* 会报错              |
 | 可选                                                 | `PINGCODE_OPEN_BASE_URL`                      | 默认 `https://open.pingcode.com/v1`；私有化部署时按官方文档改                           |
 
 
@@ -172,28 +172,32 @@ npx pingcode-jeff
 用 op_list_product_tickets 列出产品 xxx 下的工单，关键词填「登录」
 ```
 
+```
+列出某产品工单并带上关注人（include_watchers=true；列表很长时仅前 80 条会请求关注人接口）
+```
+
 ## 🛠️ 可用工具
 
 
-| 工具名称                         | 说明                           | 参数                                                                                     |
-| ---------------------------- | ---------------------------- | -------------------------------------------------------------------------------------- |
-| `login`                      | 打开浏览器进行登录                    | 无                                                                                      |
-| `logout`                     | 退出登录，清除凭证                    | 无                                                                                      |
-| `check_auth`                 | 检查登录状态                       | 无                                                                                      |
-| `get_work_item`              | 获取工作项详情                      | `identifier`: 工作项编号（如 LFY-123）                                                         |
-| `list_projects`              | 列出所有可访问项目                    | 无                                                                                      |
-| `list_releases`              | 列出项目的发布版本                    | `project_id`: 项目标识（如 LFY）                                                              |
-| `get_release_items`          | 获取版本关联的工作项                   | `release_id`: 版本ID `project_id`: 项目标识 `item_type`: bug/story/all                       |
-| `search_work_items`          | 搜索工作项                        | `query`: 搜索关键词 `project_id`: 项目标识（可选）                                                  |
-| `update_work_item_state`     | 更新工作项状态                      | `work_item_id`: 工作项编号 `state_name`: 目标状态                                               |
-| `get_bug_field_options`      | 获取缺陷字段可选值                    | `work_item_id`: 缺陷工作项编号                                                                |
-| `update_bug_fields`          | 更新缺陷的分析和解决方案                 | `work_item_id`: 工作项编号 `reason`: 原因分析（可选） `solution`: 解决方案（可选） `jiejuefangfa`: 解决方法（可选） |
-| `op_logout`                  | 【开放平台】清除缓存的企业令牌              | 无                                                                                      |
-| `op_check_auth`              | 【开放平台】校验 client 凭证并换取/缓存企业令牌 | 无                                                                                      |
-| `op_list_products`           | 【开放平台】列出产品（Ship）             | 无                                                                                      |
-| `op_list_product_ideas`      | 【开放平台】列出产品下需求                | `product_id` `keywords`（可选）                                                            |
-| `op_list_product_tickets`    | 【开放平台】列出产品下工单                | `product_id` `keywords`（可选）                                                            |
-| `op_list_product_work_items` | 【开放平台】列出产品下需求+工单             | `product_id`                                                                           |
+| 工具名称                         | 说明                                      | 参数                                                                                     |
+| ---------------------------- | --------------------------------------- | -------------------------------------------------------------------------------------- |
+| `login`                      | 打开浏览器进行登录                               | 无                                                                                      |
+| `logout`                     | 退出登录，清除凭证                               | 无                                                                                      |
+| `check_auth`                 | 检查登录状态                                  | 无                                                                                      |
+| `get_work_item`              | 获取工作项详情                                 | `identifier`: 工作项编号（如 LFY-123）                                                         |
+| `list_projects`              | 列出所有可访问项目                               | 无                                                                                      |
+| `list_releases`              | 列出项目的发布版本                               | `project_id`: 项目标识（如 LFY）                                                              |
+| `get_release_items`          | 获取版本关联的工作项                              | `release_id`: 版本ID `project_id`: 项目标识 `item_type`: bug/story/all                       |
+| `search_work_items`          | 搜索工作项                                   | `query`: 搜索关键词 `project_id`: 项目标识（可选）                                                  |
+| `update_work_item_state`     | 更新工作项状态                                 | `work_item_id`: 工作项编号 `state_name`: 目标状态                                               |
+| `get_bug_field_options`      | 获取缺陷字段可选值                               | `work_item_id`: 缺陷工作项编号                                                                |
+| `update_bug_fields`          | 更新缺陷的分析和解决方案                            | `work_item_id`: 工作项编号 `reason`: 原因分析（可选） `solution`: 解决方案（可选） `jiejuefangfa`: 解决方法（可选） |
+| `op_logout`                  | 【开放平台】清除缓存的企业令牌                         | 无                                                                                      |
+| `op_check_auth`              | 【开放平台】校验 client 凭证并换取/缓存企业令牌            | 无                                                                                      |
+| `op_list_products`           | 【开放平台】列出产品（Ship）                        | 无                                                                                      |
+| `op_list_product_ideas`      | 【开放平台】列出产品下需求（含**模块**列，对应 `suite.name`） | `product_id` `keywords`（可选） `include_watchers`（可选，true 时追加关注人，默认仅前 80 条各查一次）           |
+| `op_list_product_tickets`    | 【开放平台】列出产品下工单（含模块列；接口无 `suite` 时为 `-`）  | `product_id` `keywords`（可选） `include_watchers`（同上）                                     |
+| `op_list_product_work_items` | 【开放平台】列出产品下需求+工单（均含模块列）                 | `product_id` `include_watchers`（可选，需求/工单各最多前 80 条拉关注人）                                 |
 
 
 ## 💡 使用示例
@@ -260,7 +264,7 @@ https://yourcompany.pingcode.com/pjm/projects/LFY/releases/QxednuAG/workitems
 | `PINGCODE_OPEN_BASE_URL` | 否             | API 根路径            | `https://open.pingcode.com/v1` |
 
 
-**令牌缓存**：`op_*` 首次成功换票后会写入 `~/.pingcode-mcp/openapi.json`。企业令牌约 **30 天**有效，过期后会在下次调用时自动用 `client_id`/`secret` 再换；若你在后台 **重置 Secret** 或换了应用，请更新 MCP 里的 `env` 并可选调用 `**op_logout`** 清缓存后再用 `**op_check_auth`**。
+**令牌缓存**：`op_`* 首次成功换票后会写入 `~/.pingcode-mcp/openapi.json`。企业令牌约 **30 天**有效，过期后会在下次调用时自动用 `client_id`/`secret` 再换；若你在后台 **重置 Secret** 或换了应用，请更新 MCP 里的 `env` 并可选调用 `**op_logout`** 清缓存后再用 `**op_check_auth`**。
 
 ### 开放平台集成测试（真实请求）
 
@@ -366,7 +370,7 @@ pingcode-jeff/
 **Q: PJM 的 cookie 凭证过期了怎么办？**  
 A: 重新调用 `login` 工具完成浏览器登录。
 
-**Q: 开放平台 `op_`* 报错未配置或 401？**  
+*Q: 开放平台 `op_` 报错未配置或 401？**  
 A: 检查 MCP `env` 里是否已配置 `PINGCODE_CLIENT_ID` / `PINGCODE_CLIENT_SECRET`；Secret 被重置后需更新配置，并可调用 `op_logout` 再 `op_check_auth`。
 
 **Q: 支持哪些 MCP 客户端？**  

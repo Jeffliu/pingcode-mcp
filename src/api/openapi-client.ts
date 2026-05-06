@@ -6,6 +6,7 @@ import {
 } from '../utils/openapi-token.js';
 import type {
   Paginated,
+  ParticipantRow,
   ShipIdea,
   ShipProduct,
   ShipTicket,
@@ -188,6 +189,26 @@ export class OpenApiClient {
       (pageIndex, ps) => this.listTickets({ ...opts, pageIndex, pageSize: ps }),
       pageSize
     );
+  }
+
+  // -------------------------------------------------------------------------
+  // 关注人（principal: idea / ticket）
+  // -------------------------------------------------------------------------
+
+  /**
+   * GET /v1/participants?principal_type=idea|ticket&principal_id=...
+   */
+  async listParticipants(
+    principalType: 'idea' | 'ticket',
+    principalId: string,
+    opts: ListOpts = {}
+  ): Promise<Paginated<ParticipantRow>> {
+    return this.request<Paginated<ParticipantRow>>('GET', '/participants', {
+      principal_type: principalType,
+      principal_id: principalId,
+      page_size: opts.pageSize ?? 100,
+      page_index: opts.pageIndex ?? 0,
+    });
   }
 }
 
