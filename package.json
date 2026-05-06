@@ -1,20 +1,21 @@
 {
-  "name": "pingcode-mcp",
+  "name": "pingcode-jeff",
   "version": "1.1.1",
-  "description": "PingCode MCP Server - 与 PingCode 项目管理系统交互，支持查询、搜索和更新工作项",
-  "author": "ratat",
+  "description": "PingCode MCP（Jeff 维护版）：PJM 工作项/发布与开放平台 Ship 产品·需求·工单，支持浏览器登录与企业令牌",
+  "author": "Jeff",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ratatatat1/pingcode-mcp.git"
+    "url": "git+https://github.com/liuzhaoren/pingcode-jeff.git"
   },
-  "homepage": "https://github.com/ratatatat1/pingcode-mcp#readme",
+  "homepage": "https://github.com/liuzhaoren/pingcode-jeff#readme",
   "bugs": {
-    "url": "https://github.com/ratatatat1/pingcode-mcp/issues"
+    "url": "https://github.com/liuzhaoren/pingcode-jeff/issues"
   },
   "keywords": [
     "mcp",
     "pingcode",
+    "pingcode-jeff",
     "model-context-protocol",
     "ai",
     "release",
@@ -24,7 +25,7 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "pingcode-mcp": "./dist/index.js"
+    "pingcode-jeff": "./dist/index.js"
   },
   "files": [
     "dist"
@@ -32,7 +33,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test:openapi": "node --import tsx --test tests/openapi-ship.integration.test.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",

@@ -2,3 +2,6 @@ node_modules/
 dist/
 *.log
 .DS_Store
+
+# 本地开放平台集成测试凭据（勿提交）
+tests/.env.openapi.local
