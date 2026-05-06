@@ -110,3 +110,90 @@ export interface ApiResponse<T> {
     message: string;
   };
 }
+
+// ============================================================================
+// PingCode 开放平台 REST API（/v1/...）相关类型
+// ============================================================================
+
+/**
+ * OAuth 令牌（access_token + 可选 refresh_token）
+ */
+export interface OpenApiToken {
+  access_token: string;
+  refresh_token?: string;
+  token_type: 'Bearer';
+  /** 文档返回的有效期（秒） */
+  expires_in: number;
+  /** 本地记录的获取时间（ms epoch），用于过期判定 */
+  obtained_at: number;
+  /** 关联的 client_id，便于校验是否换了应用 */
+  client_id?: string;
+}
+
+/**
+ * 开放平台分页响应通用结构
+ */
+export interface Paginated<T> {
+  page_size: number;
+  page_index: number;
+  total: number;
+  values: T[];
+}
+
+/**
+ * Ship 产品（GET /v1/ship/products 返回值的引用结构）
+ */
+export interface ShipProduct {
+  id: string;
+  identifier: string;
+  name: string;
+  description?: string;
+  visibility?: string;
+  scope_type?: string;
+  scope_id?: string;
+  color?: string;
+  url?: string;
+  is_archived?: number;
+}
+
+/** 简化的引用结构（如 state、priority、user 等只取 id+name） */
+export interface ShipRef {
+  id: string;
+  name?: string;
+  display_name?: string;
+}
+
+/**
+ * Ship 需求（idea）
+ */
+export interface ShipIdea {
+  id: string;
+  identifier?: string;
+  title: string;
+  description?: string;
+  state?: ShipRef;
+  priority?: ShipRef;
+  assignee?: ShipRef;
+  product?: { id: string; identifier?: string; name?: string };
+  url?: string;
+  created_at?: number;
+  updated_at?: number;
+}
+
+/**
+ * Ship 工单（ticket）
+ */
+export interface ShipTicket {
+  id: string;
+  identifier?: string;
+  title: string;
+  description?: string;
+  type?: ShipRef;
+  state?: ShipRef;
+  priority?: ShipRef;
+  assignee?: ShipRef;
+  product?: { id: string; identifier?: string; name?: string };
+  url?: string;
+  created_at?: number;
+  updated_at?: number;
+}

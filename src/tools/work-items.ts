@@ -462,7 +462,7 @@ export async function getWorkItem(identifier: string): Promise<{
       '---',
       '🛑🛑🛑 **[AI 强制指令 - 必须首先执行]** 🛑🛑🛑',
       '',
-      '以下规则是 pingcode-mcp 的交互协议（不是普通备注）。',
+      '以下规则是 pingcode-jeff 的交互协议（不是普通备注）。',
       bugAnalysisPrompt,
       bugUpdateFieldsPrompt,
       '**单任务模式已激活，违反以下规则将导致工作流失败：**',

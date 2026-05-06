@@ -8,11 +8,18 @@ import {
 
 import { login, logout, checkAuth } from './tools/login.js';
 import { getWorkItem, getReleaseItems, searchWorkItems, listReleases, listProjects, updateWorkItemState, getBugFieldOptions, updateBugFields } from './tools/work-items.js';
+import { opLogout, opCheckAuth } from './tools/openapi-auth.js';
+import {
+  listProducts as opListProducts,
+  listProductIdeas as opListProductIdeas,
+  listProductTickets as opListProductTickets,
+  listProductWorkItems as opListProductWorkItems,
+} from './tools/openapi-products.js';
 
 // 创建 MCP 服务器
 const server = new Server(
   {
-    name: 'pingcode-mcp',
+    name: 'pingcode-jeff',
     version: '1.1.1',
   },
   {
@@ -191,6 +198,80 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
           },
           required: ['work_item_id'],
+        },
+      },
+      // ======================================================================
+      // PingCode 开放平台 REST API（企业令牌 / client_credentials）
+      // ======================================================================
+      {
+        name: 'op_logout',
+        description:
+          '【开放平台】清除本地缓存的企业令牌文件（~/.pingcode-mcp/openapi.json）。下次调用 op_* 时会用环境变量中的 client_id/secret 重新换取。',
+        inputSchema: { type: 'object', properties: {}, required: [] },
+      },
+      {
+        name: 'op_check_auth',
+        description:
+          '【开放平台】检查是否已配置 PINGCODE_CLIENT_ID / PINGCODE_CLIENT_SECRET；若缓存令牌过期或不存在，会尝试调用 client_credentials 换取企业令牌并写入缓存。',
+        inputSchema: { type: 'object', properties: {}, required: [] },
+      },
+      {
+        name: 'op_list_products',
+        description:
+          '【开放平台 / Ship 模块】列出当前用户可访问的所有产品（Product）。返回 product 标识、名称和 product_id。',
+        inputSchema: { type: 'object', properties: {}, required: [] },
+      },
+      {
+        name: 'op_list_product_ideas',
+        description:
+          '【开放平台 / Ship 模块】列出某个产品下的所有需求（Idea）。支持可选关键词搜索。',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            product_id: {
+              type: 'string',
+              description: '产品 ID（24 位 hex），可通过 op_list_products 获取',
+            },
+            keywords: {
+              type: 'string',
+              description: '搜索关键词（可选），匹配需求编号或标题',
+            },
+          },
+          required: ['product_id'],
+        },
+      },
+      {
+        name: 'op_list_product_tickets',
+        description:
+          '【开放平台 / Ship 模块】列出某个产品下的所有工单（Ticket）。支持可选关键词搜索。',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            product_id: {
+              type: 'string',
+              description: '产品 ID（24 位 hex），可通过 op_list_products 获取',
+            },
+            keywords: {
+              type: 'string',
+              description: '搜索关键词（可选），匹配工单编号或标题',
+            },
+          },
+          required: ['product_id'],
+        },
+      },
+      {
+        name: 'op_list_product_work_items',
+        description:
+          '【开放平台 / Ship 模块】一次性列出某个产品下的所有需求和工单（合并输出）。',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            product_id: {
+              type: 'string',
+              description: '产品 ID（24 位 hex），可通过 op_list_products 获取',
+            },
+          },
+          required: ['product_id'],
         },
       },
     ],
@@ -385,6 +466,74 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
+      // ===== 开放平台（企业令牌）=====
+      case 'op_logout': {
+        const result = opLogout();
+        return {
+          content: [{ type: 'text', text: result.message }],
+          isError: !result.success,
+        };
+      }
+
+      case 'op_check_auth': {
+        const result = await opCheckAuth();
+        let text = result.message;
+        if (result.expiresAt) text += `\n令牌到期时间: ${result.expiresAt}`;
+        return {
+          content: [{ type: 'text', text }],
+          isError: !result.authenticated,
+        };
+      }
+
+      case 'op_list_products': {
+        const result = await opListProducts();
+        return {
+          content: [
+            { type: 'text', text: result.success ? result.data! : `错误: ${result.error}` },
+          ],
+          isError: !result.success,
+        };
+      }
+
+      case 'op_list_product_ideas': {
+        const { product_id, keywords } = args as {
+          product_id: string;
+          keywords?: string;
+        };
+        const result = await opListProductIdeas(product_id, keywords);
+        return {
+          content: [
+            { type: 'text', text: result.success ? result.data! : `错误: ${result.error}` },
+          ],
+          isError: !result.success,
+        };
+      }
+
+      case 'op_list_product_tickets': {
+        const { product_id, keywords } = args as {
+          product_id: string;
+          keywords?: string;
+        };
+        const result = await opListProductTickets(product_id, keywords);
+        return {
+          content: [
+            { type: 'text', text: result.success ? result.data! : `错误: ${result.error}` },
+          ],
+          isError: !result.success,
+        };
+      }
+
+      case 'op_list_product_work_items': {
+        const { product_id } = args as { product_id: string };
+        const result = await opListProductWorkItems(product_id);
+        return {
+          content: [
+            { type: 'text', text: result.success ? result.data! : `错误: ${result.error}` },
+          ],
+          isError: !result.success,
+        };
+      }
+
       default:
         return {
           content: [
@@ -413,7 +562,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('PingCode MCP Server 已启动');
+  console.error('pingcode-jeff MCP Server 已启动');
 }
 
 main().catch((error) => {
