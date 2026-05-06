@@ -20,7 +20,7 @@ import {
 const server = new Server(
   {
     name: 'pingcode-jeff',
-    version: '1.1.1',
+    version: '1.1.2',
   },
   {
     capabilities: {
